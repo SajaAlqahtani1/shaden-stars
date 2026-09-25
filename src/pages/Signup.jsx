@@ -9,6 +9,7 @@ import {
 import { auth } from "../firebase.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getAuthErrorMessage } from "../utils/authErrors.js";
+import { MailIcon, LockIcon, UserIcon, EyeIcon, EyeOffIcon, GoogleIcon } from "../components/icons.jsx";
 import "./Auth.css";
 
 const googleProvider = new GoogleAuthProvider();
@@ -89,24 +90,32 @@ function Signup() {
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="auth-field">
               <label htmlFor="name">الاسم</label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                required
-              />
+              <div className="auth-input-wrap">
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="أدخل اسمك"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  required
+                />
+                <UserIcon className="auth-input-icon" />
+              </div>
             </div>
 
             <div className="auth-field">
               <label htmlFor="email">البريد الإلكتروني</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
+              <div className="auth-input-wrap">
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="أدخل بريدك الإلكتروني"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+                <MailIcon className="auth-input-icon" />
+              </div>
             </div>
 
             <div className="auth-field">
@@ -115,29 +124,36 @@ function Signup() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="أدخل كلمة المرور"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
                 />
+                <LockIcon className="auth-input-icon" />
                 <button
                   type="button"
                   className="auth-toggle-password"
                   onClick={() => setShowPassword((previous) => !previous)}
+                  aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
                 >
-                  {showPassword ? "إخفاء" : "إظهار"}
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
             </div>
 
             <div className="auth-field">
               <label htmlFor="confirmPassword">تأكيد كلمة المرور</label>
-              <input
-                id="confirmPassword"
-                type={showPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                required
-              />
+              <div className="auth-input-wrap">
+                <input
+                  id="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="أعد إدخال كلمة المرور"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  required
+                />
+                <LockIcon className="auth-input-icon" />
+              </div>
             </div>
 
             {error && <p className="auth-error">{error}</p>}
@@ -155,7 +171,8 @@ function Signup() {
             onClick={handleGoogleSignup}
             disabled={loading}
           >
-            المتابعة باستخدام Google
+            <span>المتابعة باستخدام Google</span>
+            <GoogleIcon className="auth-google-icon" />
           </button>
 
           <p className="auth-bottom-link">

@@ -42,6 +42,7 @@
   border-radius: var(--radius);
   padding: 24px;
   box-sizing: border-box;
+  box-shadow: 0 20px 40px -12px rgba(48, 38, 75, 0.18);
 }
 
 .auth-card-title {
@@ -72,18 +73,37 @@
 }
 
 .auth-field input {
+  width: 100%;
   font-family: var(--font-body);
   font-size: 1rem;
-  padding: 12px 14px;
+  padding: 12px 44px 12px 14px;
   border: 1px solid var(--primary-light);
   border-radius: var(--radius);
   background: var(--background);
   color: var(--text);
   outline: none;
+  box-sizing: border-box;
 }
 
 .auth-field input:focus {
   border-color: var(--primary);
+}
+
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  pointer-events: none;
 }
 
 .auth-password-row {
@@ -93,19 +113,29 @@
 }
 
 .auth-password-row input {
-  width: 100%;
+  padding-left: 40px;
 }
 
 .auth-toggle-password {
   position: absolute;
-  left: 8px;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
   background: none;
   border: none;
-  padding: 4px 8px;
-  font-size: 0.85rem;
-  font-weight: 700;
+  padding: 0;
   color: var(--text-muted);
   cursor: pointer;
+}
+
+.auth-toggle-password svg {
+  width: 100%;
+  height: 100%;
 }
 
 .auth-forgot-link {
@@ -166,6 +196,10 @@
 
 .auth-google-button {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--primary-light);
@@ -175,6 +209,12 @@
 .auth-google-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.auth-google-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .auth-bottom-link {

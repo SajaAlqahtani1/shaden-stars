@@ -9,6 +9,7 @@ import {
 import { auth } from "../firebase.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { getAuthErrorMessage } from "../utils/authErrors.js";
+import { MailIcon, LockIcon, EyeIcon, EyeOffIcon, GoogleIcon } from "../components/icons.jsx";
 import "./Auth.css";
 
 const googleProvider = new GoogleAuthProvider();
@@ -89,13 +90,17 @@ function Login() {
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="auth-field">
               <label htmlFor="email">البريد الإلكتروني</label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-              />
+              <div className="auth-input-wrap">
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="أدخل بريدك الإلكتروني"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+                <MailIcon className="auth-input-icon" />
+              </div>
             </div>
 
             <div className="auth-field">
@@ -104,16 +109,19 @@ function Login() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="أدخل كلمة المرور"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   required
                 />
+                <LockIcon className="auth-input-icon" />
                 <button
                   type="button"
                   className="auth-toggle-password"
                   onClick={() => setShowPassword((previous) => !previous)}
+                  aria-label={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
                 >
-                  {showPassword ? "إخفاء" : "إظهار"}
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                 </button>
               </div>
             </div>
@@ -142,7 +150,8 @@ function Login() {
             onClick={handleGoogleLogin}
             disabled={loading}
           >
-            المتابعة باستخدام Google
+            <span>المتابعة باستخدام Google</span>
+            <GoogleIcon className="auth-google-icon" />
           </button>
 
           <p className="auth-bottom-link">
