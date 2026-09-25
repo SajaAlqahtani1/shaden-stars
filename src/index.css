@@ -1,0 +1,55 @@
+:root {
+  --primary: #7557c8;
+  --primary-light: #ece4ff;
+  --background: #f5f0ff;
+  --surface: #ffffff;
+  --text: #30264b;
+  --text-muted: #746a8a;
+  --star: #ffd14d;
+
+  --font-title: "Lemonada", sans-serif;
+  --font-body: "Baloo Bhaijaan 2", sans-serif;
+  --radius: 20px;
+}
+
+[data-theme="boy"] {
+  --primary: #8a6712;
+  --primary-light: #fff5c8;
+  --background: #fff9e6;
+  --surface: #ffffff;
+  --text: #3b2f1a;
+  --text-muted: #7a6a4a;
+  --star: #ffd14d;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--background);
+  color: var(--text);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-title);
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 24px;
+  background: var(--primary);
+  color: #ffffff;
+  cursor: pointer;
+}
