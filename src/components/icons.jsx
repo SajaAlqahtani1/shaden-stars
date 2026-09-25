@@ -44,6 +44,110 @@ export function EyeOffIcon(props) {
   );
 }
 
+export function StarIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6-5.9-3.3-5.9 3.3 1.3-6.6-4.9-4.5 6.6-.8z" />
+    </svg>
+  );
+}
+
+export function LinkIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M9 15l6-6" />
+      <path d="M11 6.5l1-1a3.5 3.5 0 0 1 5 5l-1 1" />
+      <path d="M13 17.5l-1 1a3.5 3.5 0 0 1-5-5l1-1" />
+    </svg>
+  );
+}
+
+export function DotsVerticalIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <circle cx="12" cy="5" r="1.8" />
+      <circle cx="12" cy="12" r="1.8" />
+      <circle cx="12" cy="19" r="1.8" />
+    </svg>
+  );
+}
+
+export function EditIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M4 20l4.2-.6L19 8.6a1.5 1.5 0 0 0 0-2.1l-1.5-1.5a1.5 1.5 0 0 0-2.1 0L4.6 15.8z" />
+      <path d="M14 6l4 4" />
+    </svg>
+  );
+}
+
+export function TrashIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 7h14" />
+      <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+      <path d="M7 7l1 13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-13" />
+    </svg>
+  );
+}
+
+export function PlusIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </svg>
+  );
+}
+
+export function BackArrowIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 12h14" />
+      <path d="M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+export function SmileIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M8.5 13.5c.7 1.3 2 2 3.5 2s2.8-.7 3.5-2" />
+      <path d="M9 10h.01" />
+      <path d="M15 10h.01" />
+    </svg>
+  );
+}
+
+export function GirlAvatarIcon(props) {
+  return (
+    <svg viewBox="0 0 40 40" {...props}>
+      <circle cx="20" cy="20" r="20" fill="var(--primary-light)" />
+      <path d="M11 17c0-5.5 4-9 9-9s9 3.5 9 9c0 1-2 1.5-2 1.5v3.5c0 1.5-1 2-1 2l-1.5 3.5a2 2 0 0 1-2 1.3h-5a2 2 0 0 1-2-1.3L13 22c0-.3-2-.5-2-1.5z" fill="#3a2a1a" />
+      <circle cx="20" cy="20" r="7.5" fill="#f4c9a0" />
+      <circle cx="17.3" cy="19.5" r="1" fill="#3a2a1a" />
+      <circle cx="22.7" cy="19.5" r="1" fill="#3a2a1a" />
+      <path d="M17.5 23c1 .8 3.5.8 4.5 0" stroke="#a15c3a" strokeWidth="1" fill="none" strokeLinecap="round" />
+      <circle cx="12" cy="24" r="2.4" fill="#3a2a1a" />
+      <circle cx="28" cy="24" r="2.4" fill="#3a2a1a" />
+    </svg>
+  );
+}
+
+export function BoyAvatarIcon(props) {
+  return (
+    <svg viewBox="0 0 40 40" {...props}>
+      <circle cx="20" cy="20" r="20" fill="var(--primary-light)" />
+      <circle cx="20" cy="19" r="8.5" fill="#f4c9a0" />
+      <path d="M11.5 18c0-5.5 4-9.5 8.5-9.5s8.5 4 8.5 9.5c-2-1-3.5-2.7-4.3-4.5-2 2-6 3.3-9.5 3.3-1.2 0-2.2 0-3.2.5z" fill="#3a2a1a" />
+      <circle cx="17.3" cy="19.5" r="1" fill="#3a2a1a" />
+      <circle cx="22.7" cy="19.5" r="1" fill="#3a2a1a" />
+      <path d="M17.5 22.5c1 .8 3.5.8 4.5 0" stroke="#a15c3a" strokeWidth="1" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export function GoogleIcon(props) {
   return (
     <svg viewBox="0 0 48 48" {...props}>

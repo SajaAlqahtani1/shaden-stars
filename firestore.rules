@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isGuardianOf(childId) {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/children/$(childId)).data.guardianId == request.auth.uid;
+    }
+
+    match /children/{childId} {
+      allow get: if true;
+      allow list: if isSignedIn() && resource.data.guardianId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.guardianId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.guardianId == request.auth.uid
+                    && request.resource.data.guardianId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.guardianId == request.auth.uid;
+
+      match /{subcollection}/{docId} {
+        allow read: if true;
+        allow write: if isGuardianOf(childId);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
