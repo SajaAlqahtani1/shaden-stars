@@ -1,0 +1,246 @@
+.manage-tasks-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px 32px;
+  background: var(--background);
+  box-sizing: border-box;
+}
+
+.manage-tasks-container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.manage-tasks-section-title {
+  font-family: var(--font-title);
+  color: var(--text);
+  font-size: 1.5rem;
+  margin: 8px 0 16px;
+  text-align: right;
+}
+
+.manage-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.manage-task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manage-task-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.manage-task-icon-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.manage-task-icon-btn.edit {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.manage-task-icon-btn.delete {
+  background: #fde2e2;
+  color: #c0392b;
+}
+
+.manage-task-locked {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 4px;
+}
+
+.manage-task-locked svg {
+  width: 15px;
+  height: 15px;
+}
+
+.task-sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(48, 38, 75, 0.45);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.task-sheet-panel {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  padding: 12px 20px 28px;
+  box-sizing: border-box;
+  max-height: 88vh;
+  overflow-y: auto;
+  animation: task-sheet-slide-up 0.25s ease-out;
+}
+
+@keyframes task-sheet-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.task-sheet-handle {
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  margin: 0 auto 16px;
+}
+
+.task-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.task-sheet-title {
+  font-family: var(--font-title);
+  color: var(--text);
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.task-sheet-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.task-sheet-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.task-sheet-section-label {
+  font-family: var(--font-body);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 4px 0 10px;
+}
+
+.task-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.task-suggestion-chip {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+}
+
+.task-sheet-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.task-sheet-divider::before,
+.task-sheet-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--primary-light);
+}
+
+.stars-stepper-row {
+  margin-top: 20px;
+}
+
+.stars-stepper-row label {
+  font-family: var(--font-body);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.stars-stepper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.stars-stepper-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.stars-stepper-btn.minus {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.stars-stepper-btn.plus {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.stars-stepper-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stars-stepper-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 24px;
+  text-align: center;
+}
+
+.task-sheet-submit {
+  width: 100%;
+  margin-top: 24px;
+  padding: 16px;
+  font-size: 1.05rem;
+}

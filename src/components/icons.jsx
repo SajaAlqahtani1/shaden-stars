@@ -1,3 +1,12 @@
+export function CloseIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 5l14 14" />
+      <path d="M19 5L5 19" />
+    </svg>
+  );
+}
+
 export function MailIcon(props) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -120,30 +129,30 @@ export function SmileIcon(props) {
   );
 }
 
-export function GirlAvatarIcon(props) {
+export function SparkleIcon(props) {
   return (
-    <svg viewBox="0 0 40 40" {...props}>
-      <circle cx="20" cy="20" r="20" fill="var(--primary-light)" />
-      <path d="M11 17c0-5.5 4-9 9-9s9 3.5 9 9c0 1-2 1.5-2 1.5v3.5c0 1.5-1 2-1 2l-1.5 3.5a2 2 0 0 1-2 1.3h-5a2 2 0 0 1-2-1.3L13 22c0-.3-2-.5-2-1.5z" fill="#3a2a1a" />
-      <circle cx="20" cy="20" r="7.5" fill="#f4c9a0" />
-      <circle cx="17.3" cy="19.5" r="1" fill="#3a2a1a" />
-      <circle cx="22.7" cy="19.5" r="1" fill="#3a2a1a" />
-      <path d="M17.5 23c1 .8 3.5.8 4.5 0" stroke="#a15c3a" strokeWidth="1" fill="none" strokeLinecap="round" />
-      <circle cx="12" cy="24" r="2.4" fill="#3a2a1a" />
-      <circle cx="28" cy="24" r="2.4" fill="#3a2a1a" />
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 2l2 8 8 2-8 2-2 8-2-8-8-2 8-2z" />
     </svg>
   );
 }
 
-export function BoyAvatarIcon(props) {
+export function GiftIcon(props) {
   return (
-    <svg viewBox="0 0 40 40" {...props}>
-      <circle cx="20" cy="20" r="20" fill="var(--primary-light)" />
-      <circle cx="20" cy="19" r="8.5" fill="#f4c9a0" />
-      <path d="M11.5 18c0-5.5 4-9.5 8.5-9.5s8.5 4 8.5 9.5c-2-1-3.5-2.7-4.3-4.5-2 2-6 3.3-9.5 3.3-1.2 0-2.2 0-3.2.5z" fill="#3a2a1a" />
-      <circle cx="17.3" cy="19.5" r="1" fill="#3a2a1a" />
-      <circle cx="22.7" cy="19.5" r="1" fill="#3a2a1a" />
-      <path d="M17.5 22.5c1 .8 3.5.8 4.5 0" stroke="#a15c3a" strokeWidth="1" fill="none" strokeLinecap="round" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <rect x="4" y="9" width="16" height="4" rx="1" />
+      <rect x="5" y="13" width="14" height="7" rx="1" />
+      <path d="M12 9v11" />
+      <path d="M12 9c-1.5-3-5-3-5-.5S9.5 9 12 9z" />
+      <path d="M12 9c1.5-3 5-3 5-.5S14.5 9 12 9z" />
+    </svg>
+  );
+}
+
+export function CheckIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M5 12.5l4.5 4.5L19 7" />
     </svg>
   );
 }

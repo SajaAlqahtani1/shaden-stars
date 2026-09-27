@@ -1,14 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  StarIcon,
-  LinkIcon,
-  DotsVerticalIcon,
-  EditIcon,
-  TrashIcon,
-  GirlAvatarIcon,
-  BoyAvatarIcon,
-} from "./icons.jsx";
+import { StarIcon, LinkIcon, DotsVerticalIcon, EditIcon, TrashIcon } from "./icons.jsx";
+import { Avatar } from "./avatars.jsx";
 import { formatStarsCount } from "../utils/pluralStars.js";
 
 function ChildCard({ child, onDelete }) {
@@ -17,21 +10,37 @@ function ChildCard({ child, onDelete }) {
   const [copied, setCopied] = useState(false);
 
   const isBoy = child.gender === "boy";
-  const Avatar = isBoy ? BoyAvatarIcon : GirlAvatarIcon;
 
-  async function handleCopyLink() {
+  async function handleCopyLink(event) {
+    event.stopPropagation();
     const link = `${window.location.origin}/view/${child.id}`;
     await navigator.clipboard.writeText(link);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
 
-  function handleEdit() {
+  function handleOpenDashboard() {
+    navigate(`/children/${child.id}`);
+  }
+
+  function handleToggleMenu(event) {
+    event.stopPropagation();
+    setMenuOpen((previous) => !previous);
+  }
+
+  function handleCloseMenu(event) {
+    event.stopPropagation();
+    setMenuOpen(false);
+  }
+
+  function handleEdit(event) {
+    event.stopPropagation();
     setMenuOpen(false);
     navigate(`/children/${child.id}/edit`);
   }
 
-  function handleDelete() {
+  function handleDelete(event) {
+    event.stopPropagation();
     setMenuOpen(false);
     const confirmed = window.confirm(`هل تريد حذف ${child.name}؟`);
     if (confirmed) {
@@ -40,9 +49,20 @@ function ChildCard({ child, onDelete }) {
   }
 
   return (
-    <div className="child-card" data-theme={isBoy ? "boy" : undefined}>
+    <div
+      className="child-card"
+      data-theme={isBoy ? "boy" : undefined}
+      role="button"
+      tabIndex={0}
+      onClick={handleOpenDashboard}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          handleOpenDashboard();
+        }
+      }}
+    >
       <div className="child-card-top">
-        <Avatar className="child-avatar" />
+        <Avatar avatar={child.avatar} gender={child.gender} className="child-avatar" />
 
         <div className="child-info">
           <h3 className="child-name">{child.name}</h3>
@@ -52,35 +72,37 @@ function ChildCard({ child, onDelete }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          className="child-menu-trigger"
-          onClick={() => setMenuOpen((previous) => !previous)}
-          aria-label="خيارات"
-        >
-          <DotsVerticalIcon />
-        </button>
+        <div className="child-menu-wrap">
+          <button
+            type="button"
+            className="child-menu-trigger"
+            onClick={handleToggleMenu}
+            aria-label="خيارات"
+          >
+            <DotsVerticalIcon />
+          </button>
 
-        {menuOpen && (
-          <>
-            <button
-              type="button"
-              className="child-menu-backdrop"
-              onClick={() => setMenuOpen(false)}
-              aria-label="إغلاق القائمة"
-            />
-            <div className="child-menu">
-              <button type="button" className="child-menu-item" onClick={handleEdit}>
-                <EditIcon />
-                تعديل
-              </button>
-              <button type="button" className="child-menu-item danger" onClick={handleDelete}>
-                <TrashIcon />
-                حذف
-              </button>
-            </div>
-          </>
-        )}
+          {menuOpen && (
+            <>
+              <button
+                type="button"
+                className="child-menu-backdrop"
+                onClick={handleCloseMenu}
+                aria-label="إغلاق القائمة"
+              />
+              <div className="child-menu">
+                <button type="button" className="child-menu-item" onClick={handleEdit}>
+                  <EditIcon />
+                  تعديل
+                </button>
+                <button type="button" className="child-menu-item danger" onClick={handleDelete}>
+                  <TrashIcon />
+                  حذف
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       <button type="button" className="child-link-button" onClick={handleCopyLink}>

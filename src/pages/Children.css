@@ -103,6 +103,11 @@
   color: var(--star);
 }
 
+.child-menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
 .child-menu-trigger {
   width: 32px;
   height: 32px;
@@ -150,8 +155,8 @@
 
 .child-menu {
   position: absolute;
-  top: 44px;
-  right: 0;
+  top: 40px;
+  left: 0;
   z-index: 10;
   width: 150px;
   background: var(--surface);
@@ -347,6 +352,44 @@
 
 .gender-option.selected .gender-option-radio::after {
   opacity: 1;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.avatar-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+}
+
+.avatar-option-circle {
+  width: 52px;
+  height: 52px;
+  border: 2px solid transparent;
+}
+
+.avatar-option-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.avatar-option.selected .avatar-option-circle {
+  border-color: var(--primary);
+}
+
+.avatar-option.selected .avatar-option-label {
+  color: var(--primary);
 }
 
 .add-child-save {
