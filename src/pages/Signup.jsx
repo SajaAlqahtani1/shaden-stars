@@ -7,9 +7,10 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../firebase.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 import { getAuthErrorMessage } from "../utils/authErrors.js";
 import { MailIcon, LockIcon, UserIcon, EyeIcon, EyeOffIcon, GoogleIcon } from "../components/icons.jsx";
+import gazelleSrc from "../assets/mascot/gazelle.png";
 import "./Auth.css";
 
 const googleProvider = new GoogleAuthProvider();
@@ -80,7 +81,9 @@ function Signup() {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <div className="auth-logo" />
+        <div className="auth-logo">
+          <img src={gazelleSrc} alt="غزالة نجوم شادن" />
+        </div>
         <h1 className="auth-brand-title">نجوم شادن</h1>
         <p className="auth-subtitle">تابع نجوم أطفالك وشجعهم كل يوم</p>
 

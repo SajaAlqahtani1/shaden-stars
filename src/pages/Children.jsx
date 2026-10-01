@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { collection, deleteDoc, doc, onSnapshot, query, where } from "firebase/firestore";
 import { auth, db } from "../firebase.js";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useAuth } from "../context/useAuth.js";
 import ChildCard from "../components/ChildCard.jsx";
 import { PlusIcon, StarIcon } from "../components/icons.jsx";
 import "./Children.css";

@@ -1,8 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { collection, doc, increment, onSnapshot, orderBy, query, updateDoc, writeBatch } from "firebase/firestore";
+import {
+  collection,
+  deleteField,
+  doc,
+  increment,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+  writeBatch,
+} from "firebase/firestore";
 import { db } from "../firebase.js";
-import { BackArrowIcon, StarIcon, GiftIcon, SparkleIcon, CheckIcon, PlusIcon } from "../components/icons.jsx";
+import { StarIcon, GiftIcon, SparkleIcon, CheckIcon, PlusIcon, CloseIcon } from "../components/icons.jsx";
+import PageHeader from "../components/PageHeader.jsx";
 import { Avatar } from "../components/avatars.jsx";
 import { formatStarsCount } from "../utils/pluralStars.js";
 import { getLocalDateKey } from "../utils/date.js";
@@ -29,7 +41,9 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [toast, setToast] = useState(null);
+  const [celebration, setCelebration] = useState(null);
   const toastTimeoutRef = useRef(null);
+  const lastPrayerAchievementRef = useRef(null);
 
   useEffect(() => {
     const handleError = () => {
@@ -89,22 +103,65 @@ function Dashboard() {
     }
   }, [child, tasks, childId]);
 
-  async function applyStarDelta(taskId, delta) {
+  // Adds (or removes) stars in one batch. If the added stars reach the current reward,
+  // the same batch marks it achieved and keeps only the extra stars in progressStars.
+  // Pass undoAchievement to reverse a reward that the undone stars had unlocked.
+  async function applyStarChange(dayUpdate, delta, undoAchievement = null) {
     const batch = writeBatch(db);
     const childRef = doc(db, "children", childId);
     const dayRef = doc(db, "children", childId, "days", todayKey);
 
-    batch.set(dayRef, { taskStars: { [taskId]: increment(delta) } }, { merge: true });
-    batch.update(childRef, { totalStars: increment(delta), progressStars: increment(delta) });
+    const progressStars = child.progressStars || 0;
+    const currentReward = rewards.find((reward) => !reward.achieved);
+    const childUpdate = { totalStars: increment(delta) };
+    let achievement = null;
 
+    if (undoAchievement) {
+      batch.update(doc(db, "children", childId, "rewards", undoAchievement.rewardId), {
+        achieved: false,
+        achievedAt: deleteField(),
+      });
+      childUpdate.progressStars = increment(delta + undoAchievement.starsNeeded);
+      childUpdate.pendingCelebration = deleteField();
+    } else if (delta > 0 && currentReward && progressStars + delta >= currentReward.starsNeeded) {
+      achievement = {
+        rewardId: currentReward.id,
+        rewardName: currentReward.name,
+        starsNeeded: currentReward.starsNeeded,
+      };
+      batch.update(doc(db, "children", childId, "rewards", currentReward.id), {
+        achieved: true,
+        achievedAt: serverTimestamp(),
+      });
+      childUpdate.progressStars = increment(delta - currentReward.starsNeeded);
+      childUpdate.pendingCelebration = {
+        rewardId: currentReward.id,
+        rewardName: currentReward.name,
+        at: serverTimestamp(),
+      };
+    } else if (progressStars + delta < 0) {
+      childUpdate.progressStars = 0;
+    } else {
+      childUpdate.progressStars = increment(delta);
+    }
+
+    batch.set(dayRef, dayUpdate, { merge: true });
+    batch.update(childRef, childUpdate);
     await batch.commit();
+
+    return achievement;
   }
 
   async function handleAddTaskStar(task) {
-    await applyStarDelta(task.id, task.stars);
+    const delta = task.stars;
+    const achievement = await applyStarChange({ taskStars: { [task.id]: increment(delta) } }, delta);
+    lastPrayerAchievementRef.current = null;
+    if (achievement) {
+      setCelebration(achievement);
+    }
 
     clearTimeout(toastTimeoutRef.current);
-    setToast({ taskId: task.id, taskName: task.name, delta: task.stars });
+    setToast({ taskId: task.id, taskName: task.name, delta, achievement });
     toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
   }
 
@@ -113,23 +170,54 @@ function Dashboard() {
       return;
     }
     clearTimeout(toastTimeoutRef.current);
-    const { taskId, delta } = toast;
+    const { taskId, delta, achievement } = toast;
     setToast(null);
-    await applyStarDelta(taskId, -delta);
+    if (achievement) {
+      setCelebration(null);
+    }
+    await applyStarChange({ taskStars: { [taskId]: increment(-delta) } }, -delta, achievement);
   }
 
   async function handleTogglePrayer(prayerKey) {
     const isChecked = Boolean(dayData?.prayers?.[prayerKey]);
-    const delta = isChecked ? -1 : 1;
+    const dayUpdate = { prayers: { [prayerKey]: !isChecked } };
 
-    const batch = writeBatch(db);
-    const childRef = doc(db, "children", childId);
-    const dayRef = doc(db, "children", childId, "days", todayKey);
+    if (isChecked) {
+      // Unchecking the prayer that just unlocked a reward reverses that reward too.
+      const lastAchievement = lastPrayerAchievementRef.current;
+      const undoAchievement = lastAchievement?.prayerKey === prayerKey ? lastAchievement.achievement : null;
+      lastPrayerAchievementRef.current = null;
+      if (undoAchievement) {
+        setCelebration(null);
+      }
+      await applyStarChange(dayUpdate, -1, undoAchievement);
+      return;
+    }
 
-    batch.set(dayRef, { prayers: { [prayerKey]: !isChecked } }, { merge: true });
-    batch.update(childRef, { totalStars: increment(delta), progressStars: increment(delta) });
+    const achievement = await applyStarChange(dayUpdate, 1);
+    lastPrayerAchievementRef.current = achievement ? { prayerKey, achievement } : null;
+    if (achievement) {
+      setCelebration(achievement);
+    }
+  }
 
-    await batch.commit();
+  const lastAchievedReward = rewards
+    .filter((reward) => reward.achieved)
+    .reduce(
+      (latest, reward) =>
+        !latest || (reward.achievedAt?.toMillis?.() || 0) > (latest.achievedAt?.toMillis?.() || 0) ? reward : latest,
+      null
+    );
+
+  // TEMPORARY: lets the guardian replay the celebration on the child view. Remove before launch.
+  async function handleTestCelebration() {
+    await updateDoc(doc(db, "children", childId), {
+      pendingCelebration: {
+        rewardId: lastAchievedReward.id,
+        rewardName: lastAchievedReward.name,
+        at: serverTimestamp(),
+      },
+    });
   }
 
   if (loading) {
@@ -168,11 +256,7 @@ function Dashboard() {
   return (
     <div className="dashboard-page" data-theme={isBoy ? "boy" : undefined}>
       <div className="dashboard-container">
-        <div className="dashboard-header">
-          <button type="button" className="dashboard-back" onClick={() => navigate("/")} aria-label="رجوع">
-            <BackArrowIcon />
-          </button>
-
+        <PageHeader backTo="/">
           <div className="dashboard-child-info">
             <Avatar avatar={child.avatar} gender={child.gender} className="dashboard-avatar" />
             <div>
@@ -183,7 +267,26 @@ function Dashboard() {
               </div>
             </div>
           </div>
-        </div>
+        </PageHeader>
+
+        {celebration && (
+          <div className="celebration-banner">
+            <span className="celebration-banner-icon">
+              <GiftIcon />
+            </span>
+            <span className="celebration-banner-text">
+              {isBoy ? "وصل" : "وصلت"} {child.name} للمكافأة: {celebration.rewardName}
+            </span>
+            <button
+              type="button"
+              className="celebration-banner-close"
+              onClick={() => setCelebration(null)}
+              aria-label="إغلاق"
+            >
+              <CloseIcon />
+            </button>
+          </div>
+        )}
 
         <div className="reward-card">
           {currentReward ? (
@@ -210,6 +313,13 @@ function Dashboard() {
                 أضف مكافأة
               </Link>
             </div>
+          )}
+
+          {/* TEMPORARY: test link for the celebration screen. Remove before launch. */}
+          {lastAchievedReward && (
+            <button type="button" className="reward-test-celebration" onClick={handleTestCelebration}>
+              تجربة الاحتفال
+            </button>
           )}
         </div>
 

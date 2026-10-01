@@ -5,6 +5,7 @@ import Children from "./pages/Children.jsx";
 import AddChild from "./pages/AddChild.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ManageTasks from "./pages/ManageTasks.jsx";
+import ManageRewards from "./pages/ManageRewards.jsx";
 import Viewer from "./pages/Viewer.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
@@ -40,6 +41,14 @@ function App() {
         element={
           <ProtectedRoute>
             <ManageTasks />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/children/:childId/rewards"
+        element={
+          <ProtectedRoute>
+            <ManageRewards />
           </ProtectedRoute>
         }
       />

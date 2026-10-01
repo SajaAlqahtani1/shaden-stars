@@ -1,0 +1,326 @@
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--background);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px 48px;
+  animation: celebration-enter 0.45s ease-out;
+}
+
+@keyframes celebration-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.celebration-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.celebration-title {
+  color: var(--primary);
+  font-size: 3.4rem;
+  line-height: 1.3;
+}
+
+.celebration-subtitle {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.celebration-stage {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  height: 400px;
+  margin: 16px 0 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.celebration-circle {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  width: 380px;
+  max-width: 90%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--primary-light);
+}
+
+.celebration-gazelle {
+  position: relative;
+  z-index: 1;
+  height: 380px;
+  max-width: 100%;
+  object-fit: contain;
+  animation: celebration-jump 1.1s ease-in-out infinite;
+}
+
+@keyframes celebration-jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-28px);
+  }
+  60% {
+    transform: translateY(-28px);
+  }
+}
+
+.celebration-ground {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 160px;
+  height: 16px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--primary);
+  animation: celebration-shadow 1.1s ease-in-out infinite;
+}
+
+@keyframes celebration-shadow {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleX(1);
+  }
+  45%,
+  60% {
+    transform: translateX(-50%) scaleX(0.75);
+  }
+}
+
+.celebration-confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.celebration-falling {
+  position: absolute;
+  top: -40px;
+  display: block;
+  animation-name: celebration-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes celebration-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.celebration-falling.star {
+  width: 26px;
+  height: 26px;
+  color: var(--star);
+}
+
+.celebration-falling.star svg {
+  width: 100%;
+  height: 100%;
+}
+
+.celebration-falling.piece {
+  width: 7px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.celebration-falling.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.celebration-falling.primary {
+  background: var(--primary);
+}
+
+.celebration-falling.light {
+  background: var(--primary-light);
+  border: 1px solid var(--primary);
+}
+
+.celebration-falling.gold {
+  background: var(--star);
+}
+
+.celebration-reward {
+  width: 100%;
+  background: var(--primary-light);
+  border-radius: 32px;
+  padding: 20px 28px 20px 20px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 20px 40px -18px rgba(48, 38, 75, 0.25);
+}
+
+.celebration-reward-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: right;
+}
+
+.celebration-reward-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 6px 18px;
+  border-radius: 999px;
+}
+
+.celebration-reward-label svg {
+  width: 20px;
+  height: 20px;
+  color: var(--star);
+}
+
+.celebration-reward-name {
+  color: var(--primary);
+  font-size: 2.3rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.celebration-reward-cheer {
+  color: #d9a300;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.celebration-reward-icon {
+  width: 180px;
+  height: 180px;
+  border-radius: 28px;
+  background: var(--surface);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.celebration-reward-icon svg {
+  width: 96px;
+  height: 96px;
+}
+
+.celebration-button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 22px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 16px 32px -14px rgba(48, 38, 75, 0.35);
+}
+
+.celebration-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 720px) {
+  .celebration-overlay {
+    padding: 24px 16px 32px;
+  }
+
+  .celebration-title {
+    font-size: 2.4rem;
+  }
+
+  .celebration-subtitle {
+    font-size: 1.2rem;
+  }
+
+  .celebration-stage {
+    height: 280px;
+  }
+
+  .celebration-circle {
+    top: 40px;
+    width: 260px;
+  }
+
+  .celebration-gazelle {
+    height: 260px;
+  }
+
+  .celebration-reward-icon {
+    width: 100px;
+    height: 100px;
+  }
+
+  .celebration-reward-icon svg {
+    width: 56px;
+    height: 56px;
+  }
+
+  .celebration-reward-name {
+    font-size: 1.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebration-overlay,
+  .celebration-gazelle,
+  .celebration-ground {
+    animation: none;
+  }
+
+  .celebration-ground {
+    transform: translateX(-50%);
+  }
+
+  .celebration-confetti {
+    display: none;
+  }
+}

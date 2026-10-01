@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "../firebase.js";
-import { useAuth } from "../context/AuthContext.jsx";
-import { BackArrowIcon, SmileIcon } from "../components/icons.jsx";
-import { AVATARS, AVATAR_KEYS, getDefaultAvatarKey } from "../components/avatars.jsx";
+import { useAuth } from "../context/useAuth.js";
+import { SmileIcon } from "../components/icons.jsx";
+import PageHeader from "../components/PageHeader.jsx";
+import { AVATARS, AVATAR_KEYS, getDefaultAvatarKey } from "../components/avatarData.js";
 import { IPAD_TASK_NAME, getCalmTaskName, isCalmTaskName } from "../utils/defaultTasks.js";
 import girlIconSrc from "../assets/gender/girl.svg";
 import boyIconSrc from "../assets/gender/boy.svg";
@@ -106,7 +107,7 @@ function AddChild() {
         await tasksBatch.commit();
       }
       navigate("/");
-    } catch (saveError) {
+    } catch {
       setError("حدث خطأ، حاول مرة أخرى");
     } finally {
       setSaving(false);
@@ -120,17 +121,7 @@ function AddChild() {
   return (
     <div className="auth-page">
       <div className="auth-container">
-        <div className="add-child-header">
-          <h1 className="add-child-title">{isEditMode ? "تعديل النجم" : "إضافة نجم"}</h1>
-          <button
-            type="button"
-            className="add-child-back"
-            onClick={() => navigate("/")}
-            aria-label="رجوع"
-          >
-            <BackArrowIcon />
-          </button>
-        </div>
+        <PageHeader title={isEditMode ? "تعديل النجم" : "إضافة نجم"} backTo="/" />
 
         <div className="add-child-card">
           <form onSubmit={handleSave}>

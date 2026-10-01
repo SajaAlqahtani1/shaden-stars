@@ -25,8 +25,12 @@
 .manage-tasks-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 24px;
+}
+
+.manage-tasks-list .task-card {
+  margin-bottom: 0;
 }
 
 .manage-task-actions {

@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CloseIcon } from "./icons.jsx";
 import { TASK_SUGGESTIONS } from "../utils/taskSuggestions.js";
 
-function TaskSheet({ open, mode, initialTask, existingNames, onClose, onSubmit }) {
-  const [name, setName] = useState("");
-  const [stars, setStars] = useState(1);
+// Mounted only while open, so each opening starts with fresh state.
+function TaskSheet({ initialTask, existingNames, onClose, onSubmit }) {
+  const [name, setName] = useState(initialTask ? initialTask.name : "");
+  const [stars, setStars] = useState(initialTask ? initialTask.stars : 1);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    setName(initialTask ? initialTask.name : "");
-    setStars(initialTask ? initialTask.stars : 1);
-    setError("");
-    setSaving(false);
-  }, [open, initialTask]);
-
-  if (!open) {
-    return null;
-  }
-
-  const isEdit = mode === "edit";
+  const isEdit = Boolean(initialTask);
   const otherNames = existingNames.filter((existingName) => existingName !== initialTask?.name);
   const visibleSuggestions = TASK_SUGGESTIONS.filter((suggestion) => !otherNames.includes(suggestion));
 
@@ -44,7 +31,7 @@ function TaskSheet({ open, mode, initialTask, existingNames, onClose, onSubmit }
     setSaving(true);
     try {
       await onSubmit({ name: trimmedName, stars });
-    } catch (submitError) {
+    } catch {
       setError("حدث خطأ، حاول مرة أخرى");
       setSaving(false);
     }

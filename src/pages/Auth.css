@@ -20,6 +20,17 @@
   border-radius: 50%;
   background: var(--primary-light);
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.auth-logo img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  display: block;
 }
 
 .auth-brand-title {

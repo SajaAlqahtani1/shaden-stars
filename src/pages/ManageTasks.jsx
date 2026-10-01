@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
 import { db } from "../firebase.js";
-import { useAuth } from "../context/AuthContext.jsx";
-import { BackArrowIcon, SparkleIcon, EditIcon, TrashIcon, LockIcon, PlusIcon } from "../components/icons.jsx";
+import { useAuth } from "../context/useAuth.js";
+import { SparkleIcon, EditIcon, TrashIcon, LockIcon, PlusIcon } from "../components/icons.jsx";
 import TaskSheet from "../components/TaskSheet.jsx";
+import PageHeader from "../components/PageHeader.jsx";
 import { formatStarsCount } from "../utils/pluralStars.js";
 import "./Auth.css";
 import "./Children.css";
@@ -113,17 +114,7 @@ function ManageTasks() {
   return (
     <div className="manage-tasks-page" data-theme={isBoy ? "boy" : undefined}>
       <div className="manage-tasks-container">
-        <div className="add-child-header">
-          <h1 className="add-child-title">إدارة المهام</h1>
-          <button
-            type="button"
-            className="add-child-back"
-            onClick={() => navigate(`/children/${childId}`)}
-            aria-label="رجوع"
-          >
-            <BackArrowIcon />
-          </button>
-        </div>
+        <PageHeader title="إدارة المهام" backTo={`/children/${childId}`} />
 
         <h2 className="manage-tasks-section-title">المهام الحالية</h2>
 
@@ -136,7 +127,7 @@ function ManageTasks() {
                 </span>
                 <div className="task-name-col">
                   <span className="task-name">الصلوات</span>
-                  <span className="task-today-badge">{formatStarsCount(5)}</span>
+                  <span className="task-today-badge">{formatStarsCount(5)} يومياً</span>
                 </div>
               </div>
               <span className="manage-task-locked">
@@ -187,14 +178,14 @@ function ManageTasks() {
         </button>
       </div>
 
-      <TaskSheet
-        open={sheetOpen}
-        mode={editingTask ? "edit" : "add"}
-        initialTask={editingTask}
-        existingNames={existingNames}
-        onClose={handleCloseSheet}
-        onSubmit={handleSubmitTask}
-      />
+      {sheetOpen && (
+        <TaskSheet
+          initialTask={editingTask}
+          existingNames={existingNames}
+          onClose={handleCloseSheet}
+          onSubmit={handleSubmitTask}
+        />
+      )}
     </div>
   );
 }

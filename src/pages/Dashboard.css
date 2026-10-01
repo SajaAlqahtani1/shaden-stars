@@ -20,32 +20,6 @@
   margin-top: 40px;
 }
 
-.dashboard-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.dashboard-back {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  box-shadow: 0 8px 20px -8px rgba(48, 38, 75, 0.25);
-  flex-shrink: 0;
-}
-
-.dashboard-back svg {
-  width: 20px;
-  height: 20px;
-}
-
 .dashboard-child-info {
   display: flex;
   align-items: center;
@@ -78,6 +52,71 @@
   width: 16px;
   height: 16px;
   color: var(--star);
+}
+
+.celebration-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 12px 28px -10px rgba(48, 38, 75, 0.35);
+  animation: celebration-pop 0.35s ease-out;
+}
+
+@keyframes celebration-pop {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.celebration-banner-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--star);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.celebration-banner-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.celebration-banner-text {
+  flex: 1;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.celebration-banner-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.celebration-banner-close svg {
+  width: 14px;
+  height: 14px;
 }
 
 .reward-card {
@@ -173,6 +212,17 @@
   color: var(--primary);
   font-weight: 700;
   text-decoration: none;
+}
+
+/* TEMPORARY: test link for the celebration screen. Remove before launch. */
+.reward-test-celebration {
+  display: block;
+  margin: 12px auto 0;
+  padding: 4px 8px;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-decoration: underline;
 }
 
 .dashboard-section-title {
