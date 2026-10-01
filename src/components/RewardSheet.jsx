@@ -6,6 +6,7 @@ const STARS_STEP = 5;
 const MIN_STARS = 5;
 const MAX_STARS = 100;
 const DEFAULT_STARS = 10;
+const NAME_MAX_LENGTH = 40;
 
 // Mounted only while open, so each opening starts with fresh state.
 function RewardSheet({ initialReward, existingNames, onClose, onSubmit }) {
@@ -81,6 +82,7 @@ function RewardSheet({ initialReward, existingNames, onClose, onSubmit }) {
                 id="rewardName"
                 type="text"
                 placeholder="اسم المكافأة"
+                maxLength={NAME_MAX_LENGTH}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 required

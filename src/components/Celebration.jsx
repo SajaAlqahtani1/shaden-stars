@@ -51,7 +51,7 @@ function Celebration({ childName, isBoy, rewardName, onClose }) {
         <div className="celebration-reward">
           <div className="celebration-reward-text">
             <span className="celebration-reward-label">
-              مكافأتك
+              {isBoy ? "مكافأتك" : "مكافأتكِ"}
               <StarIcon />
             </span>
             <h2 className="celebration-reward-name">{rewardName}</h2>

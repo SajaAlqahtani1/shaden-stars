@@ -7,6 +7,8 @@ import { SparkleIcon, EditIcon, TrashIcon, LockIcon, PlusIcon } from "../compone
 import TaskSheet from "../components/TaskSheet.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import { formatStarsCount } from "../utils/pluralStars.js";
+import { SAVE_ERROR_MESSAGE } from "../utils/errors.js";
+import { useDocumentTheme } from "../hooks/useDocumentTheme.js";
 import "./Auth.css";
 import "./Children.css";
 import "./Dashboard.css";
@@ -23,6 +25,9 @@ function ManageTasks() {
   const [error, setError] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const [saveError, setSaveError] = useState("");
+
+  useDocumentTheme(child?.gender === "boy");
 
   useEffect(() => {
     const handleError = () => {
@@ -73,28 +78,36 @@ function ManageTasks() {
     setEditingTask(null);
   }
 
-  async function handleSubmitTask({ name, stars }) {
+  function showSaveError() {
+    setSaveError(SAVE_ERROR_MESSAGE);
+  }
+
+  // Writes are not awaited: the list updates right away from the local cache,
+  // and a failure shows a message instead of leaving the sheet stuck on "جاري...".
+  function handleSubmitTask({ name, stars }) {
+    setSaveError("");
     if (editingTask) {
-      await updateDoc(doc(db, "children", childId, "tasks", editingTask.id), { name, stars });
+      updateDoc(doc(db, "children", childId, "tasks", editingTask.id), { name, stars }).catch(showSaveError);
     } else {
       const maxOrder = tasks.reduce((max, task) => Math.max(max, task.order || 0), 0);
-      await addDoc(collection(db, "children", childId, "tasks"), {
+      addDoc(collection(db, "children", childId, "tasks"), {
         name,
         stars,
         order: maxOrder + 1,
-      });
+      }).catch(showSaveError);
     }
     handleCloseSheet();
   }
 
-  async function handleDeleteTask(task) {
+  function handleDeleteTask(task) {
     const confirmed = window.confirm(`هل تريد حذف مهمة "${task.name}"؟`);
     if (confirmed) {
-      await deleteDoc(doc(db, "children", childId, "tasks", task.id));
+      setSaveError("");
+      deleteDoc(doc(db, "children", childId, "tasks", task.id)).catch(showSaveError);
     }
   }
 
-  if (loading) {
+  if (loading || (child && user && child.guardianId !== user.uid)) {
     return null;
   }
 
@@ -171,6 +184,8 @@ function ManageTasks() {
             </div>
           ))}
         </div>
+
+        {saveError && <p className="dashboard-error dashboard-save-error">{saveError}</p>}
 
         <button type="button" className="children-add-button" onClick={handleOpenAddSheet}>
           <PlusIcon />

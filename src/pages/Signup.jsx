@@ -10,7 +10,7 @@ import { auth } from "../firebase.js";
 import { useAuth } from "../context/useAuth.js";
 import { getAuthErrorMessage } from "../utils/authErrors.js";
 import { MailIcon, LockIcon, UserIcon, EyeIcon, EyeOffIcon, GoogleIcon } from "../components/icons.jsx";
-import gazelleSrc from "../assets/mascot/gazelle.png";
+import gazelleSrc from "../assets/mascot/gazelle.webp";
 import "./Auth.css";
 
 const googleProvider = new GoogleAuthProvider();

@@ -4,9 +4,10 @@ import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore"
 import { db } from "../firebase.js";
 import { StarIcon, GiftIcon, SparkleIcon, CheckIcon } from "../components/icons.jsx";
 import { formatStarsCount } from "../utils/pluralStars.js";
-import { getLocalDateKey } from "../utils/date.js";
+import { useTodayKey } from "../hooks/useTodayKey.js";
+import { useDocumentTheme } from "../hooks/useDocumentTheme.js";
 import Celebration from "../components/Celebration.jsx";
-import gazelleSrc from "../assets/mascot/gazelle.png";
+import gazelleSrc from "../assets/mascot/gazelle.webp";
 import "./Viewer.css";
 
 const PRAYERS = [
@@ -114,7 +115,7 @@ function findIncreasedCards(previous, next) {
 function Viewer() {
   const { childId } = useParams();
 
-  const [todayKey, setTodayKey] = useState(getLocalDateKey());
+  const todayKey = useTodayKey();
   const [child, setChild] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [dayData, setDayData] = useState(null);
@@ -126,10 +127,21 @@ function Viewer() {
   const [celebratedIds, setCelebratedIds] = useState(() => readCelebratedIds(childId));
   const previousDayRef = useRef(null);
 
-  // The iPad can stay open overnight, so check every minute whether a new day has started.
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useDocumentTheme(child?.gender === "boy");
+
+  // Without internet the first load never finishes, so tell the child why.
+  // Firestore reconnects by itself and the page fills in when the internet is back.
   useEffect(() => {
-    const intervalId = setInterval(() => setTodayKey(getLocalDateKey()), 60000);
-    return () => clearInterval(intervalId);
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
   }, []);
 
   useEffect(() => {
@@ -201,7 +213,7 @@ function Viewer() {
       <div className="viewer-page">
         <div className="viewer-status">
           <img src={gazelleSrc} alt="" className="viewer-status-image" />
-          <p>جاري التحميل...</p>
+          <p>{isOnline ? "جاري التحميل..." : "لا يوجد اتصال بالإنترنت، ستظهر نجومك عند عودة الاتصال"}</p>
         </div>
       </div>
     );
@@ -259,7 +271,7 @@ function Viewer() {
 
         <section className="viewer-card viewer-path-card">
           <div className="viewer-path-top">
-            <h2 className="viewer-card-title">طريقك إلى المكافأة</h2>
+            <h2 className="viewer-card-title">{isBoy ? "طريقك إلى المكافأة" : "طريقكِ إلى المكافأة"}</h2>
             <span className="viewer-earned-badge">
               {totalStars > 0 ? `${formatStarsCount(totalStars)} مكتسبة` : formatStarsCount(0)}
               <StarIcon className="viewer-star-filled" />
@@ -303,7 +315,7 @@ function Viewer() {
             )}
           </div>
 
-          {!currentReward && <p className="viewer-no-reward">اطلب من أهلك يضيفون مكافأة</p>}
+          {!currentReward && <p className="viewer-no-reward">{isBoy ? "اطلب من أهلك يضيفون مكافأة" : "اطلبي من أهلك يضيفون مكافأة"}</p>}
         </section>
 
         <div className="viewer-section-header">
@@ -347,7 +359,7 @@ function Viewer() {
         {currentReward && (
           <section className="viewer-card viewer-next-reward">
             <div className="viewer-next-reward-text">
-              <span className="viewer-next-reward-label">مكافأتك القادمة</span>
+              <span className="viewer-next-reward-label">{isBoy ? "مكافأتك القادمة" : "مكافأتكِ القادمة"}</span>
               <h2 className="viewer-next-reward-name">{currentReward.name}</h2>
               {starsLeft > 0 && (
                 <span className="viewer-next-reward-left">

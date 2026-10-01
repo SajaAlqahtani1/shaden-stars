@@ -18,6 +18,8 @@ import { EditIcon, TrashIcon, PlusIcon, ChevronUpIcon, ChevronDownIcon, CheckIco
 import PageHeader from "../components/PageHeader.jsx";
 import RewardSheet from "../components/RewardSheet.jsx";
 import { formatStarsCount } from "../utils/pluralStars.js";
+import { SAVE_ERROR_MESSAGE } from "../utils/errors.js";
+import { useDocumentTheme } from "../hooks/useDocumentTheme.js";
 import "./Auth.css";
 import "./Children.css";
 import "./Dashboard.css";
@@ -42,6 +44,9 @@ function ManageRewards() {
   const [error, setError] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editingReward, setEditingReward] = useState(null);
+  const [saveError, setSaveError] = useState("");
+
+  useDocumentTheme(child?.gender === "boy");
 
   useEffect(() => {
     const handleError = () => {
@@ -92,37 +97,48 @@ function ManageRewards() {
     setEditingReward(null);
   }
 
-  async function handleSubmitReward({ name, starsNeeded }) {
+  function showSaveError() {
+    setSaveError(SAVE_ERROR_MESSAGE);
+  }
+
+  // Writes are not awaited: the list updates right away from the local cache,
+  // and a failure shows a message instead of leaving the sheet stuck on "جاري...".
+  function handleSubmitReward({ name, starsNeeded }) {
+    setSaveError("");
     if (editingReward) {
-      await updateDoc(doc(db, "children", childId, "rewards", editingReward.id), { name, starsNeeded });
+      updateDoc(doc(db, "children", childId, "rewards", editingReward.id), { name, starsNeeded }).catch(
+        showSaveError
+      );
     } else {
       const maxOrder = rewards.reduce((max, reward) => Math.max(max, reward.order || 0), 0);
-      await addDoc(collection(db, "children", childId, "rewards"), {
+      addDoc(collection(db, "children", childId, "rewards"), {
         name,
         starsNeeded,
         order: maxOrder + 1,
         achieved: false,
         createdAt: serverTimestamp(),
-      });
+      }).catch(showSaveError);
     }
     handleCloseSheet();
   }
 
-  async function handleDeleteReward(reward) {
+  function handleDeleteReward(reward) {
     const confirmed = window.confirm(`هل تريد حذف مكافأة "${reward.name}"؟`);
     if (confirmed) {
-      await deleteDoc(doc(db, "children", childId, "rewards", reward.id));
+      setSaveError("");
+      deleteDoc(doc(db, "children", childId, "rewards", reward.id)).catch(showSaveError);
     }
   }
 
-  async function handleSwapOrder(first, second) {
+  function handleSwapOrder(first, second) {
     const batch = writeBatch(db);
     batch.update(doc(db, "children", childId, "rewards", first.id), { order: second.order });
     batch.update(doc(db, "children", childId, "rewards", second.id), { order: first.order });
-    await batch.commit();
+    setSaveError("");
+    batch.commit().catch(showSaveError);
   }
 
-  if (loading) {
+  if (loading || (child && user && child.guardianId !== user.uid)) {
     return null;
   }
 
@@ -247,6 +263,8 @@ function ManageRewards() {
             </div>
           </>
         )}
+
+        {saveError && <p className="dashboard-error dashboard-save-error">{saveError}</p>}
 
         <button type="button" className="children-add-button" onClick={handleOpenAddSheet}>
           <PlusIcon />

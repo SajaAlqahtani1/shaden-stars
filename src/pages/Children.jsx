@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { collection, deleteDoc, doc, onSnapshot, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, onSnapshot, query, where, writeBatch } from "firebase/firestore";
 import { auth, db } from "../firebase.js";
 import { useAuth } from "../context/useAuth.js";
 import ChildCard from "../components/ChildCard.jsx";
 import { PlusIcon, StarIcon } from "../components/icons.jsx";
 import "./Children.css";
+
+const CHILD_SUBCOLLECTIONS = ["tasks", "rewards", "days"];
+const DELETE_BATCH_SIZE = 400;
 
 function Children() {
   const { user } = useAuth();
@@ -34,8 +37,24 @@ function Children() {
     return unsubscribe;
   }, [user.uid]);
 
+  // Deletes the child's tasks, rewards, and day history first, then the child itself.
+  // The order matters: the security rules check the child doc to confirm the guardian,
+  // so once it is gone nothing under it could be deleted anymore.
   async function handleDeleteChild(childId) {
-    await deleteDoc(doc(db, "children", childId));
+    setError("");
+    try {
+      for (const name of CHILD_SUBCOLLECTIONS) {
+        const snapshot = await getDocs(collection(db, "children", childId, name));
+        for (let start = 0; start < snapshot.docs.length; start += DELETE_BATCH_SIZE) {
+          const batch = writeBatch(db);
+          snapshot.docs.slice(start, start + DELETE_BATCH_SIZE).forEach((docSnap) => batch.delete(docSnap.ref));
+          await batch.commit();
+        }
+      }
+      await deleteDoc(doc(db, "children", childId));
+    } catch {
+      setError("تعذر حذف الطفل، تحقق من الاتصال وحاول مرة أخرى");
+    }
   }
 
   return (

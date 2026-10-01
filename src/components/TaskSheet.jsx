@@ -2,6 +2,8 @@ import { useState } from "react";
 import { CloseIcon } from "./icons.jsx";
 import { TASK_SUGGESTIONS } from "../utils/taskSuggestions.js";
 
+const NAME_MAX_LENGTH = 40;
+
 // Mounted only while open, so each opening starts with fresh state.
 function TaskSheet({ initialTask, existingNames, onClose, onSubmit }) {
   const [name, setName] = useState(initialTask ? initialTask.name : "");
@@ -77,6 +79,7 @@ function TaskSheet({ initialTask, existingNames, onClose, onSubmit }) {
                 id="taskName"
                 type="text"
                 placeholder="اسم المهمة"
+                maxLength={NAME_MAX_LENGTH}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 required
@@ -96,7 +99,7 @@ function TaskSheet({ initialTask, existingNames, onClose, onSubmit }) {
               >
                 +
               </button>
-              <span className="stars-stepper-value">{stars}</span>
+              <span className="stars-stepper-value">{stars.toLocaleString("ar-EG")}</span>
               <button
                 type="button"
                 className="stars-stepper-btn minus"

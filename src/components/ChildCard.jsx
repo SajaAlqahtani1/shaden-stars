@@ -14,9 +14,14 @@ function ChildCard({ child, onDelete }) {
   async function handleCopyLink(event) {
     event.stopPropagation();
     const link = `${window.location.origin}/view/${child.id}`;
-    await navigator.clipboard.writeText(link);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Copying can be blocked by the browser; show the link so it can be copied by hand.
+      window.prompt("انسخ رابط الآيباد", link);
+    }
   }
 
   function handleOpenDashboard() {

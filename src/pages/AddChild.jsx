@@ -12,6 +12,8 @@ import boyIconSrc from "../assets/gender/boy.svg";
 import "./Auth.css";
 import "./Children.css";
 
+const NAME_MAX_LENGTH = 30;
+
 function AddChild() {
   const { id } = useParams();
   const isEditMode = Boolean(id);
@@ -34,19 +36,26 @@ function AddChild() {
     }
 
     async function loadChild() {
-      const snapshot = await getDoc(doc(db, "children", id));
-      if (snapshot.exists()) {
+      try {
+        const snapshot = await getDoc(doc(db, "children", id));
+        // Only the child's own guardian may edit it; anyone else goes back home.
+        if (!snapshot.exists() || snapshot.data().guardianId !== user.uid) {
+          navigate("/");
+          return;
+        }
         const data = snapshot.data();
         setName(data.name || "");
         setGender(data.gender || "girl");
         setOriginalGender(data.gender || "girl");
         setAvatar(data.avatar || null);
+      } catch {
+        setError("تعذر تحميل البيانات، حاول مرة أخرى لاحقا");
       }
       setLoading(false);
     }
 
     loadChild();
-  }, [id, isEditMode]);
+  }, [id, isEditMode, user.uid, navigate]);
 
   async function handleSave(event) {
     event.preventDefault();
@@ -132,6 +141,7 @@ function AddChild() {
                   id="childName"
                   type="text"
                   placeholder="أدخل اسم الطفل"
+                  maxLength={NAME_MAX_LENGTH}
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   required

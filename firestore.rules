@@ -12,17 +12,90 @@ service cloud.firestore {
         get(/databases/$(database)/documents/children/$(childId)).data.guardianId == request.auth.uid;
     }
 
+    function isValidName(value, maxLength) {
+      return value is string && value.size() > 0 && value.size() <= maxLength;
+    }
+
+    function isStarCount(value) {
+      return value is int && value >= 0 && value <= 1000000;
+    }
+
+    function isValidCelebration(value) {
+      return value is map
+        && value.keys().hasOnly(['rewardId', 'rewardName', 'at'])
+        && value.rewardId is string
+        && isValidName(value.rewardName, 40)
+        && value.at is timestamp;
+    }
+
+    // Optional fields use get() with a default, so children created before a field existed still save.
+    function isValidChild(data) {
+      return data.keys().hasOnly(['name', 'gender', 'avatar', 'guardianId', 'totalStars',
+                                  'progressStars', 'createdAt', 'pendingCelebration'])
+        && isValidName(data.name, 30)
+        && data.gender in ['girl', 'boy']
+        && data.get('avatar', '') is string
+        && data.get('avatar', '').size() <= 20
+        && isStarCount(data.get('totalStars', 0))
+        && isStarCount(data.get('progressStars', 0))
+        && (!('pendingCelebration' in data) || isValidCelebration(data.pendingCelebration));
+    }
+
+    function isValidTask(data) {
+      return data.keys().hasOnly(['name', 'stars', 'order', 'createdAt'])
+        && isValidName(data.name, 40)
+        && data.stars is int && data.stars >= 1 && data.stars <= 5
+        && data.order is number;
+    }
+
+    function isValidReward(data) {
+      return data.keys().hasOnly(['name', 'starsNeeded', 'order', 'achieved', 'achievedAt', 'createdAt'])
+        && isValidName(data.name, 40)
+        && data.starsNeeded is int && data.starsNeeded >= 1 && data.starsNeeded <= 100
+        && data.order is number
+        && data.get('achieved', false) is bool
+        && (!('achievedAt' in data) || data.achievedAt is timestamp);
+    }
+
+    function isValidDay(dayKey, data) {
+      return dayKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && data.keys().hasOnly(['taskStars', 'prayers'])
+        && data.get('taskStars', {}) is map
+        && data.get('prayers', {}) is map;
+    }
+
+    // Children: anyone with the link can read one child (the iPad view), but only the
+    // guardian can list, create, change, or delete their own children.
     match /children/{childId} {
       allow get: if true;
       allow list: if isSignedIn() && resource.data.guardianId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.guardianId == request.auth.uid;
-      allow update: if isSignedIn() && resource.data.guardianId == request.auth.uid
-                    && request.resource.data.guardianId == request.auth.uid;
+      allow create: if isSignedIn()
+                    && request.resource.data.guardianId == request.auth.uid
+                    && isValidChild(request.resource.data);
+      allow update: if isSignedIn()
+                    && resource.data.guardianId == request.auth.uid
+                    && request.resource.data.guardianId == request.auth.uid
+                    && isValidChild(request.resource.data);
       allow delete: if isSignedIn() && resource.data.guardianId == request.auth.uid;
 
-      match /{subcollection}/{docId} {
+      // Only these three subcollections exist. Reads are public (the iPad view),
+      // writes are only for the child's guardian and must have the right shape.
+      match /tasks/{taskId} {
         allow read: if true;
-        allow write: if isGuardianOf(childId);
+        allow create, update: if isGuardianOf(childId) && isValidTask(request.resource.data);
+        allow delete: if isGuardianOf(childId);
+      }
+
+      match /rewards/{rewardId} {
+        allow read: if true;
+        allow create, update: if isGuardianOf(childId) && isValidReward(request.resource.data);
+        allow delete: if isGuardianOf(childId);
+      }
+
+      match /days/{dayKey} {
+        allow read: if true;
+        allow create, update: if isGuardianOf(childId) && isValidDay(dayKey, request.resource.data);
+        allow delete: if isGuardianOf(childId);
       }
     }
 

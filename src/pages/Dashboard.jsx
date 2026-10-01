@@ -17,7 +17,10 @@ import { StarIcon, GiftIcon, SparkleIcon, CheckIcon, PlusIcon, CloseIcon } from 
 import PageHeader from "../components/PageHeader.jsx";
 import { Avatar } from "../components/avatars.jsx";
 import { formatStarsCount } from "../utils/pluralStars.js";
-import { getLocalDateKey } from "../utils/date.js";
+import { SAVE_ERROR_MESSAGE } from "../utils/errors.js";
+import { useTodayKey } from "../hooks/useTodayKey.js";
+import { useDocumentTheme } from "../hooks/useDocumentTheme.js";
+import { useAuth } from "../context/useAuth.js";
 import { CALM_TASK_NAME_GIRL, getCalmTaskName } from "../utils/defaultTasks.js";
 import "./Dashboard.css";
 
@@ -32,7 +35,8 @@ const PRAYERS = [
 function Dashboard() {
   const { childId } = useParams();
   const navigate = useNavigate();
-  const todayKey = getLocalDateKey();
+  const { user } = useAuth();
+  const todayKey = useTodayKey();
 
   const [child, setChild] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -42,8 +46,12 @@ function Dashboard() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState(null);
   const [celebration, setCelebration] = useState(null);
+  const [saveError, setSaveError] = useState("");
   const toastTimeoutRef = useRef(null);
   const lastPrayerAchievementRef = useRef(null);
+
+  const isOwner = Boolean(child && user && child.guardianId === user.uid);
+  useDocumentTheme(child?.gender === "boy");
 
   useEffect(() => {
     const handleError = () => {
@@ -88,10 +96,16 @@ function Dashboard() {
     };
   }, [childId, todayKey]);
 
+  useEffect(() => {
+    if (child && user && child.guardianId !== user.uid) {
+      navigate("/");
+    }
+  }, [child, user, navigate]);
+
   useEffect(() => () => clearTimeout(toastTimeoutRef.current), []);
 
   useEffect(() => {
-    if (!child || child.gender !== "boy" || tasks.length === 0) {
+    if (!isOwner || child.gender !== "boy" || tasks.length === 0) {
       return;
     }
 
@@ -99,14 +113,20 @@ function Dashboard() {
     if (wrongTask) {
       updateDoc(doc(db, "children", childId, "tasks", wrongTask.id), {
         name: getCalmTaskName("boy"),
-      });
+      }).catch(() => {});
     }
-  }, [child, tasks, childId]);
+  }, [isOwner, child, tasks, childId]);
+
+  function showSaveError() {
+    setSaveError(SAVE_ERROR_MESSAGE);
+  }
 
   // Adds (or removes) stars in one batch. If the added stars reach the current reward,
   // the same batch marks it achieved and keeps only the extra stars in progressStars.
   // Pass undoAchievement to reverse a reward that the undone stars had unlocked.
-  async function applyStarChange(dayUpdate, delta, undoAchievement = null) {
+  // The screen updates right away from the local cache; we don't wait for the server,
+  // so it stays responsive on slow internet and offline (Firestore sends it when back online).
+  function applyStarChange(dayUpdate, delta, undoAchievement = null) {
     const batch = writeBatch(db);
     const childRef = doc(db, "children", childId);
     const dayRef = doc(db, "children", childId, "days", todayKey);
@@ -147,14 +167,15 @@ function Dashboard() {
 
     batch.set(dayRef, dayUpdate, { merge: true });
     batch.update(childRef, childUpdate);
-    await batch.commit();
+    setSaveError("");
+    batch.commit().catch(showSaveError);
 
     return achievement;
   }
 
-  async function handleAddTaskStar(task) {
+  function handleAddTaskStar(task) {
     const delta = task.stars;
-    const achievement = await applyStarChange({ taskStars: { [task.id]: increment(delta) } }, delta);
+    const achievement = applyStarChange({ taskStars: { [task.id]: increment(delta) } }, delta);
     lastPrayerAchievementRef.current = null;
     if (achievement) {
       setCelebration(achievement);
@@ -165,7 +186,7 @@ function Dashboard() {
     toastTimeoutRef.current = setTimeout(() => setToast(null), 5000);
   }
 
-  async function handleUndo() {
+  function handleUndo() {
     if (!toast) {
       return;
     }
@@ -175,10 +196,10 @@ function Dashboard() {
     if (achievement) {
       setCelebration(null);
     }
-    await applyStarChange({ taskStars: { [taskId]: increment(-delta) } }, -delta, achievement);
+    applyStarChange({ taskStars: { [taskId]: increment(-delta) } }, -delta, achievement);
   }
 
-  async function handleTogglePrayer(prayerKey) {
+  function handleTogglePrayer(prayerKey) {
     const isChecked = Boolean(dayData?.prayers?.[prayerKey]);
     const dayUpdate = { prayers: { [prayerKey]: !isChecked } };
 
@@ -190,37 +211,18 @@ function Dashboard() {
       if (undoAchievement) {
         setCelebration(null);
       }
-      await applyStarChange(dayUpdate, -1, undoAchievement);
+      applyStarChange(dayUpdate, -1, undoAchievement);
       return;
     }
 
-    const achievement = await applyStarChange(dayUpdate, 1);
+    const achievement = applyStarChange(dayUpdate, 1);
     lastPrayerAchievementRef.current = achievement ? { prayerKey, achievement } : null;
     if (achievement) {
       setCelebration(achievement);
     }
   }
 
-  const lastAchievedReward = rewards
-    .filter((reward) => reward.achieved)
-    .reduce(
-      (latest, reward) =>
-        !latest || (reward.achievedAt?.toMillis?.() || 0) > (latest.achievedAt?.toMillis?.() || 0) ? reward : latest,
-      null
-    );
-
-  // TEMPORARY: lets the guardian replay the celebration on the child view. Remove before launch.
-  async function handleTestCelebration() {
-    await updateDoc(doc(db, "children", childId), {
-      pendingCelebration: {
-        rewardId: lastAchievedReward.id,
-        rewardName: lastAchievedReward.name,
-        at: serverTimestamp(),
-      },
-    });
-  }
-
-  if (loading) {
+  if (loading || (child && !isOwner)) {
     return null;
   }
 
@@ -299,7 +301,7 @@ function Dashboard() {
                   <span className="reward-card-name">{currentReward.name}</span>
                 </div>
                 <span className="reward-card-progress-pill">
-                  {progressStars.toLocaleString("ar-EG")} من {currentReward.starsNeeded.toLocaleString("ar-EG")} نجوم
+                  {progressStars.toLocaleString("ar-EG")} من {formatStarsCount(currentReward.starsNeeded)}
                 </span>
               </div>
               <div className="reward-progress-track">
@@ -313,13 +315,6 @@ function Dashboard() {
                 أضف مكافأة
               </Link>
             </div>
-          )}
-
-          {/* TEMPORARY: test link for the celebration screen. Remove before launch. */}
-          {lastAchievedReward && (
-            <button type="button" className="reward-test-celebration" onClick={handleTestCelebration}>
-              تجربة الاحتفال
-            </button>
           )}
         </div>
 
@@ -379,12 +374,16 @@ function Dashboard() {
 
         {toast && (
           <div className="dashboard-toast">
-            <span className="dashboard-toast-text">أضفت نجمة لـ{toast.taskName}</span>
+            <span className="dashboard-toast-text">
+              أضفت {formatStarsCount(toast.delta)} لـ{toast.taskName}
+            </span>
             <button type="button" className="dashboard-toast-undo" onClick={handleUndo}>
               تراجع
             </button>
           </div>
         )}
+
+        {saveError && <p className="dashboard-error dashboard-save-error">{saveError}</p>}
 
         <div className="dashboard-bottom-row">
           <button
